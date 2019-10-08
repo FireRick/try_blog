@@ -15,11 +15,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib.sitemaps import views as sitemap_views
 
+from blog.views import (
+    IndexView, CategoryView, TagView,
+    PostDetailView, SearchView, AuthorView,
+)
+from blog.rss import LatestPostFeed
+from blog.sitemap import PostSitemap
+from config.views import LinkView
+from comment.views import CommentView
 from .custom_site import custom_site
 
 
 urlpatterns = [
-    path('super_admin/', admin.site.urls),
-    path('admin/', custom_site.urls),
+    path('', IndexView.as_view(), name='index'),
+    path('category/<category_id>/', CategoryView.as_view(), name='category-list'),
+    path('tag/<tag_id>/', TagView.as_view(), name='tag-list'),
+    path('post/<post_id>/', PostDetailView.as_view(), name='post-detail'),
+    path('links/', LinkView.as_view() , name='links'),
+    path('search/', SearchView.as_view(), name='search'),
+    path('author/<owner_id>/', AuthorView.as_view(), name='author'),
+    path('comment/', CommentView.as_view(), name='comment'),
+    path('rss/', LatestPostFeed(), name='rss'),
+    path(r'sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
+    path('super_admin/', admin.site.urls, name='super-admin'),
+    path('admin/', custom_site.urls, name='admin'),
 ]
